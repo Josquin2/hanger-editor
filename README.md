@@ -40,6 +40,22 @@ pnpm add react   # hanger-editor/react
 `hanger-editor` is ESM + CJS, ships its own types, and targets modern browsers
 and Node 18+ (for SSR).
 
+## Playground and docs site
+
+This repository includes a small Vite site with a live composer, a rendered
+message, raw HTML, visible text and the entity JSON side by side. The same page
+contains the documentation, and every code sample can be switched between
+Vanilla, Vue/Nuxt and React.
+
+```sh
+pnpm dev:site     # http://localhost:5173
+pnpm build:site   # static output in site/dist
+```
+
+The site imports the library TypeScript source through Vite aliases, so changes
+to `src/` are visible immediately in the playground. The site is development
+tooling and is not included in the npm package.
+
 ## What it is not
 
 - It is **not** a `contenteditable` editor. Markers stay visible in the
@@ -515,12 +531,14 @@ pnpm lint
 pnpm typecheck
 pnpm test
 pnpm build
-pnpm check  # all of the above
+pnpm check       # lint, typecheck, tests, library build and site build
+pnpm dev:site    # live playground + docs at http://localhost:5173
+pnpm build:site  # static site in site/dist
 ```
 
 The test suite covers the parser, entity offsets, HTML escaping, URL policy,
 validation, every editor command, keyboard shortcuts, Vue and React adapters,
-SSR and a deterministic fuzz corpus.
+SSR, a deterministic fuzz corpus and the playground/documentation site.
 
 ## License
 
