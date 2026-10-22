@@ -5,7 +5,13 @@ import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
   {
-    ignores: ['dist/**', 'coverage/**', 'node_modules/**', '.pnpm-store/**'],
+    ignores: [
+      'dist/**',
+      'site/dist/**',
+      'coverage/**',
+      'node_modules/**',
+      '.pnpm-store/**',
+    ],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,

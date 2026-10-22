@@ -17,11 +17,19 @@
     "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true,
     "jsx": "react-jsx",
-    "types": ["node"]
+    "types": ["node"],
+    "baseUrl": ".",
+    "paths": {
+      "hanger-editor": ["./src/index.ts"],
+      "hanger-editor/vanilla": ["./src/vanilla/index.ts"],
+      "hanger-editor/vue": ["./src/vue/index.ts"],
+      "hanger-editor/react": ["./src/react/index.ts"]
+    }
   },
   "include": [
     "src",
     "tests",
+    "site",
     "tsup.config.ts",
     "vitest.config.ts"
   ]
