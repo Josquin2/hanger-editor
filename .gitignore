@@ -7,4 +7,5 @@ coverage/
 .env.*
 !.env.example
 .pnpm-store/
-site/dist/
+docs/.vitepress/dist/
+docs/.vitepress/cache/

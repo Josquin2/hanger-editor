@@ -23,14 +23,15 @@
       "hanger-editor": ["./src/index.ts"],
       "hanger-editor/vanilla": ["./src/vanilla/index.ts"],
       "hanger-editor/vue": ["./src/vue/index.ts"],
-      "hanger-editor/react": ["./src/react/index.ts"]
+      "hanger-editor/react": ["./src/react/index.ts"],
+      "hanger-editor/rich": ["./src/rich/index.ts"]
     }
   },
   "include": [
     "src",
     "tests",
-    "site",
     "tsup.config.ts",
-    "vitest.config.ts"
+    "vitest.config.ts",
+    "docs/.vitepress"
   ]
 }

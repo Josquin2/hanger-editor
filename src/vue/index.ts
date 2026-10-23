@@ -13,6 +13,7 @@ import { renderHtml, type HtmlRenderOptions } from '../core/render-html'
 import type { InlineStyle, ParsedMessage } from '../core/types'
 import { validateMessage, type ValidationError, type ValidationResult } from '../core/validate'
 import { MarkdownEditor } from '../editor/editor'
+import { RichTextarea } from './RichTextarea'
 import {
   createEmptyActiveStyles,
   type ActiveStyles,
@@ -203,6 +204,9 @@ export function useMarkdownEditor(
     },
   }
 }
+
+export { RichTextarea }
+export type { RichTextareaExpose } from './RichTextarea'
 
 export type {
   ActiveStyles,

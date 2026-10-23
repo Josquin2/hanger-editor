@@ -11,6 +11,7 @@ export default defineConfig({
       { find: /^hanger-editor\/vanilla$/, replacement: src('vanilla/index.ts') },
       { find: /^hanger-editor\/vue$/, replacement: src('vue/index.ts') },
       { find: /^hanger-editor\/react$/, replacement: src('react/index.ts') },
+      { find: /^hanger-editor\/rich$/, replacement: src('rich/index.ts') },
       { find: /^hanger-editor$/, replacement: src('index.ts') },
     ],
   },

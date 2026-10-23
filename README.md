@@ -2,12 +2,13 @@
 
 A small, framework-agnostic rich-text layer for Hanger's chat composer.
 
-It keeps the native `<textarea>` (so IME, accessibility and mobile text selection
-keep working), stores plain markdown, and gives you three things from one
-package:
+It keeps a native `<textarea>` (so IME, accessibility and mobile text selection
+keep working), stores plain markdown, and gives you:
 
 - an **editor controller** with Telegram/Discord-style formatting commands,
   keyboard shortcuts, validation and submit payloads;
+- an **optional rich textarea** that draws formatted text underneath a
+  transparent textarea, without putting HTML into the value;
 - an **isomorphic parser** that turns that markdown into a typed AST and
   Telegram-compatible entities;
 - a **sanitised HTML renderer** for displaying messages.
@@ -40,28 +41,28 @@ pnpm add react   # hanger-editor/react
 `hanger-editor` is ESM + CJS, ships its own types, and targets modern browsers
 and Node 18+ (for SSR).
 
-## Playground and docs site
+## Docs and playground
 
-This repository includes a small Vite site with a live composer, a rendered
-message, raw HTML, visible text and the entity JSON side by side. The same page
-contains the documentation, and every code sample can be switched between
-Vanilla, Vue/Nuxt and React.
+The documentation is a VitePress site in `docs/`. It includes a live playground
+built on the rich textarea, plus code groups that switch between Vanilla,
+Vue/Nuxt and React.
 
 ```sh
-pnpm dev:site     # http://localhost:5173
-pnpm build:site   # static output in site/dist
+pnpm docs:dev     # http://localhost:5173
+pnpm docs:build   # static output in docs/.vitepress/dist
+pnpm docs:preview # preview the production build
 ```
 
-The site imports the library TypeScript source through Vite aliases, so changes
-to `src/` are visible immediately in the playground. The site is development
-tooling and is not included in the npm package.
+The docs site imports the library TypeScript source through Vite aliases, so
+changes in `src/` are visible immediately. It is development tooling and is not
+included in the npm package.
 
 ## What it is not
 
-- It is **not** a `contenteditable` editor. Markers stay visible in the
-  textarea while composing, like Discord's markdown input.
+- It is **not** a `contenteditable` editor. The optional rich textarea is a
+  native textarea over a formatted mirror; the value remains markdown.
 - It is **not** a full CommonMark implementation. The dialect is deliberately
-  small and chat-shaped; see [the grammar](docs/GRAMMAR.md).
+  small and chat-shaped; see [syntax](https://github.com/Josquin2/hanger-editor/blob/main/docs/reference/syntax.md).
 - It does **not** send messages. It validates and produces a payload; your app
   decides when and how to send it.
 - It does **not** sanitise arbitrary HTML. It never accepts HTML as input —
@@ -94,6 +95,49 @@ editor.on('change', ({ canSubmit, validation }) => {
 
 You can also instantiate `new MarkdownEditor(textarea, options)` directly;
 `createMarkdownEditor` is just a convenience factory.
+
+## Rich textarea
+
+Use this when you want formatted text in place instead of only raw markdown.
+The textarea stays native and keeps the markdown value.
+
+```ts
+import { createRichTextarea } from 'hanger-editor/rich'
+import 'hanger-editor/rich-textarea.css'
+
+const rich = createRichTextarea(document.querySelector('#composer')!, {
+  markers: 'hidden', // 'dim' | 'visible'
+  submitOnEnter: true,
+  onSubmit: ({ raw, html }) => saveMessage({ content: raw, html }),
+})
+
+rich.editor.toggleBold()
+```
+
+In Vue:
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import { RichTextarea, type RichTextareaExpose } from 'hanger-editor/vue'
+import 'hanger-editor/rich-textarea.css'
+
+const message = ref('')
+const composer = ref<RichTextareaExpose | null>(null)
+</script>
+
+<template>
+  <RichTextarea ref="composer" v-model="message" markers="dim" />
+  <button @click="composer?.editor?.toggleBold()">B</button>
+</template>
+```
+
+The textarea and the formatted layer must share font metrics for the native
+caret to stay aligned. The default is monospace. Hidden delimiters still occupy
+their advance width; that is why a small gap remains where `**` or `_` was.
+
+Read the [rich textarea guide](https://github.com/Josquin2/hanger-editor/blob/main/docs/guide/rich-textarea.md)
+for the alignment rules, marker modes, and the controller API.
 
 ## Nuxt / Vue
 
@@ -312,7 +356,7 @@ Rules that matter in practice:
 - Links may contain inline formatting in the label. Nested links are not
   supported, and links cannot span lines.
 
-See [docs/GRAMMAR.md](docs/GRAMMAR.md) for the exact rules and edge cases.
+See [syntax](https://github.com/Josquin2/hanger-editor/blob/main/docs/reference/syntax.md) for the exact rules and edge cases.
 
 ## Validation
 
@@ -531,14 +575,14 @@ pnpm lint
 pnpm typecheck
 pnpm test
 pnpm build
-pnpm check       # lint, typecheck, tests, library build and site build
-pnpm dev:site    # live playground + docs at http://localhost:5173
-pnpm build:site  # static site in site/dist
+pnpm check       # lint, typecheck, tests, library and docs builds
+pnpm docs:dev    # live docs and playground at http://localhost:5173
+pnpm docs:build  # static docs in docs/.vitepress/dist
 ```
 
 The test suite covers the parser, entity offsets, HTML escaping, URL policy,
-validation, every editor command, keyboard shortcuts, Vue and React adapters,
-SSR, a deterministic fuzz corpus and the playground/documentation site.
+validation, every editor command, keyboard shortcuts, the rich overlay, Vue and
+React adapters, SSR, and a deterministic fuzz corpus.
 
 ## License
 

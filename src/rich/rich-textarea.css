@@ -1,0 +1,204 @@
+/*
+ * Rich textarea: a transparent textarea over an aligned mirror.
+ *
+ * Both layers inherit every property that affects line boxes. Monospace is
+ * deliberate: bold and italic variants keep the same advance width, so the
+ * native caret stays over the glyph it belongs to.
+ */
+.hte {
+  --hte-font: var(--vp-font-family-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  --hte-font-size: 15px;
+  --hte-line-height: 1.65;
+  --hte-padding: 12px 14px;
+  --hte-radius: 10px;
+  --hte-bg: var(--vp-c-bg-soft, #f8fafc);
+  --hte-border: var(--vp-c-divider, #d9e0e8);
+  --hte-focus: var(--vp-c-brand-1, #0b8a61);
+  --hte-text: var(--vp-c-text-1, #1c2633);
+  --hte-marker: var(--vp-c-text-3, #8b98a8);
+  --hte-caret: var(--vp-c-brand-1, #0b8a61);
+  --hte-selection: color-mix(in srgb, var(--hte-focus) 24%, transparent);
+  --hte-link: var(--vp-c-brand-1, #0b8a61);
+  --hte-url: var(--vp-c-text-3, #8b98a8);
+  --hte-code-bg: var(--vp-c-default-soft, rgb(0 0 0 / 6%));
+  --hte-code-text: var(--vp-c-text-1, #1c2633);
+  --hte-pre-bg: var(--vp-c-default-soft, rgb(0 0 0 / 6%));
+  --hte-pre-text: var(--vp-c-text-1, #1c2633);
+  --hte-spoiler-bg: var(--vp-c-default-soft, rgb(0 0 0 / 8%));
+  --hte-quote-text: var(--vp-c-text-2, #4b5b6e);
+  --hte-placeholder: var(--vp-c-text-3, #8b98a8);
+
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border: 1px solid var(--hte-border);
+  border-radius: var(--hte-radius);
+  background: var(--hte-bg);
+  color: var(--hte-text);
+  font-family: var(--hte-font);
+  font-size: var(--hte-font-size);
+  font-variant-ligatures: none;
+  font-kerning: none;
+  line-height: var(--hte-line-height);
+  tab-size: 4;
+}
+
+.hte:focus-within {
+  border-color: var(--hte-focus);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--hte-focus) 16%, transparent);
+}
+
+.hte__backdrop,
+.hte__placeholder,
+.hte__input {
+  box-sizing: border-box;
+  margin: 0;
+  border: 0;
+  padding: var(--hte-padding);
+  font-family: inherit;
+  font-size: inherit;
+  font-variant-ligatures: inherit;
+  font-kerning: inherit;
+  letter-spacing: normal;
+  line-height: inherit;
+  tab-size: inherit;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+
+.hte__backdrop {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+  color: var(--hte-text);
+  pointer-events: none;
+}
+
+.hte__highlight {
+  min-height: 100%;
+}
+
+.hte__placeholder {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+  color: var(--hte-placeholder);
+  pointer-events: none;
+}
+
+.hte__placeholder[hidden] {
+  display: none;
+}
+
+.hte__input {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 96px;
+  resize: none;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  background: transparent;
+  color: transparent;
+  caret-color: var(--hte-caret);
+  outline: none;
+  scrollbar-width: none;
+}
+
+.hte__input::-webkit-scrollbar {
+  display: none;
+}
+
+.hte__input::selection {
+  background: var(--hte-selection);
+  color: transparent;
+}
+
+/* Markdown delimiters */
+
+.hte-marker {
+  color: var(--hte-marker);
+  opacity: 0.38;
+}
+
+.hte[data-markers="visible"] .hte-marker {
+  opacity: 0.9;
+}
+
+.hte[data-markers="dim"] .hte-marker {
+  opacity: 0.38;
+}
+
+.hte[data-markers="hidden"] .hte-marker--inline {
+  color: transparent;
+  opacity: 0;
+}
+
+.hte[data-markers="hidden"] .hte-marker--block {
+  opacity: 0.32;
+}
+
+.hte-url {
+  color: var(--hte-url);
+  opacity: 0.6;
+}
+
+/* Decorations */
+
+.hte-bold {
+  font-weight: 700;
+  text-shadow: 0.02em 0 0 currentColor;
+}
+
+.hte-italic {
+  font-style: italic;
+}
+
+.hte-underline {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.hte-strikethrough {
+  text-decoration: line-through;
+}
+
+.hte-spoiler {
+  border-radius: 3px;
+  background: var(--hte-spoiler-bg);
+}
+
+.hte-code {
+  border-radius: 3px;
+  background: var(--hte-code-bg);
+  color: var(--hte-code-text);
+}
+
+.hte-pre {
+  border-radius: 3px;
+  background: var(--hte-pre-bg);
+  color: var(--hte-pre-text);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+.hte-quote {
+  color: var(--hte-quote-text);
+}
+
+.hte-link {
+  color: var(--hte-link);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+  .hte {
+    --hte-font-size: 16px;
+  }
+}

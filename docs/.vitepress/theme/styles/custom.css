@@ -1,0 +1,60 @@
+:root {
+  --vp-c-brand-1: #0b8a61;
+  --vp-c-brand-2: #0a7a56;
+  --vp-c-brand-3: #086b4b;
+  --vp-c-brand-soft: rgb(11 138 97 / 12%);
+}
+
+.dark {
+  --vp-c-brand-1: #42e6a4;
+  --vp-c-brand-2: #2fd393;
+  --vp-c-brand-3: #25c487;
+  --vp-c-brand-soft: rgb(66 230 164 / 14%);
+}
+
+.VPNavBarTitle .title {
+  font-family: var(--vp-font-family-mono);
+  font-size: 15px;
+}
+
+.playground-page .VPDoc:not(.has-sidebar) .container,
+.playground-page .VPDoc:not(.has-sidebar) .content,
+.playground-page .VPDoc .content-container {
+  max-width: 1120px;
+}
+
+.playground-page .VPDoc {
+  padding-bottom: 64px;
+}
+
+@media (max-width: 959px) {
+  .playground-page .VPDoc:not(.has-sidebar) .container,
+  .playground-page .VPDoc:not(.has-sidebar) .content,
+  .playground-page .VPDoc .content-container {
+    max-width: none;
+  }
+}
+
+/* Spoilers in rendered messages are hidden until hovered. */
+.tg-spoiler {
+  border-radius: 3px;
+  background: var(--vp-c-default-soft);
+  color: transparent;
+  cursor: pointer;
+  text-shadow: 0 0 8px var(--vp-c-text-1);
+  user-select: none;
+}
+
+.tg-spoiler:hover,
+.tg-spoiler:focus-visible {
+  background: var(--vp-c-brand-soft);
+  color: var(--vp-c-text-1);
+  text-shadow: none;
+  user-select: text;
+}
+
+.playground-lede {
+  margin: 8px 0 0;
+  color: var(--vp-c-text-2);
+  font-size: 14px;
+}

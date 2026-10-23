@@ -1,7 +1,7 @@
 {
   "name": "hanger-editor",
   "version": "0.1.0",
-  "description": "Telegram-style markdown editor, parser and safe HTML renderer for Hanger chat",
+  "description": "Telegram-style markdown editor, rich textarea, parser and safe HTML renderer for Hanger chat",
   "license": "MIT",
   "keywords": [
     "telegram",
@@ -27,7 +27,6 @@
   "sideEffects": false,
   "files": [
     "dist",
-    "docs",
     "README.md",
     "LICENSE"
   ],
@@ -55,6 +54,12 @@
       "import": "./dist/react.js",
       "require": "./dist/react.cjs"
     },
+    "./rich": {
+      "types": "./dist/rich.d.ts",
+      "import": "./dist/rich.js",
+      "require": "./dist/rich.cjs"
+    },
+    "./rich-textarea.css": "./dist/rich-textarea.css",
     "./package.json": "./package.json"
   },
   "scripts": {
@@ -64,11 +69,12 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm build:site",
+    "check": "pnpm lint && pnpm typecheck && pnpm typecheck:docs && pnpm test && pnpm build && pnpm docs:build",
     "prepublishOnly": "pnpm check",
-    "dev:site": "vite --config site/vite.config.ts",
-    "build:site": "vite build --config site/vite.config.ts",
-    "preview:site": "vite preview --config site/vite.config.ts"
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs",
+    "typecheck:docs": "vue-tsc -p docs/tsconfig.json --noEmit"
   },
   "peerDependencies": {
     "react": ">=18.0.0",
@@ -102,8 +108,9 @@
     "tsup": "^9.0.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.72.0",
-    "vite": "^8.3.5",
+    "vitepress": "^1.6.4",
     "vitest": "^5.0.5",
-    "vue": "^3.5.44"
+    "vue": "^3.5.44",
+    "vue-tsc": "^3.3.13"
   }
 }
