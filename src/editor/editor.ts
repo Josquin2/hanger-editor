@@ -270,13 +270,7 @@ export class MarkdownEditor {
 
     if (this.findInlineNode('code', selection)) return
 
-    const node = this.findInlineNode(style, selection)
-    if (node) {
-      this.unwrapInlineNode(node)
-      return
-    }
-
-    this.wrapInline(STYLE_MARKERS[style], selection)
+    this.runInlineCommand(STYLE_MARKERS[style], style, selection)
   }
 
   toggleCode(): void {
@@ -284,13 +278,7 @@ export class MarkdownEditor {
     const selection = this.getSelection()
     if (this.isInsidePre(selection) || this.isInsideLinkUrl(selection)) return
 
-    const node = this.findInlineNode('code', selection)
-    if (node) {
-      this.unwrapInlineNode(node)
-      return
-    }
-
-    this.wrapInline('`', selection)
+    this.runInlineCommand('`', 'code', selection)
   }
 
   toggleBold(): void {
@@ -640,6 +628,84 @@ export class MarkdownEditor {
     textarea.dispatchEvent(event)
   }
 
+  private runInlineCommand(
+    marker: string,
+    style: InlineCommand,
+    selection: SelectionRange,
+  ): void {
+    const nodes = this.collectInlineNodes(style)
+    const covering = nodes.find((node) => {
+      return covers(selection, node.contentStart, node.contentEnd)
+        || (selection.start === node.sourceStart && selection.end === node.sourceEnd)
+    })
+
+    if (covering) {
+      this.unwrapInlineNode(covering)
+      return
+    }
+
+    const overlapping = nodes.filter((node) => {
+      return overlaps(selection, node.sourceStart, node.sourceEnd)
+    })
+    if (overlapping.some((node) => !contains(selection, node.sourceStart, node.sourceEnd))) {
+      return
+    }
+
+    if (overlapping.length > 0) {
+      this.wrapInlineRemoving(marker, selection, overlapping)
+      return
+    }
+
+    this.wrapInline(marker, selection)
+  }
+
+  private wrapInlineRemoving(
+    marker: string,
+    selection: SelectionRange,
+    nodes: readonly UnwrappableNode[],
+  ): void {
+    const ranges = this.inlineRanges(selection)
+    if (ranges.length === 0) return
+
+    const edits: TextEdit[] = []
+    for (const node of nodes) {
+      const content = this.textarea.value.slice(node.contentStart, node.contentEnd)
+      if (content === PLACEHOLDER) {
+        edits.push({ start: node.sourceStart, end: node.sourceEnd, replacement: '' })
+        continue
+      }
+      edits.push(
+        { start: node.sourceStart, end: node.contentStart, replacement: '' },
+        { start: node.contentEnd, end: node.sourceEnd, replacement: '' },
+      )
+    }
+
+    for (const range of ranges) {
+      edits.push(
+        { start: range.start, end: range.start, replacement: marker },
+        { start: range.end, end: range.end, replacement: marker },
+      )
+    }
+
+    this.commit(edits, mapRange(selection, edits))
+  }
+
+  private inlineRanges(selection: SelectionRange): Range[] {
+    const value = this.textarea.value
+
+    if (!value.slice(selection.start, selection.end).includes('\n')) {
+      const content = trimRange(value, selection)
+      return content.start === content.end ? [] : [content]
+    }
+
+    return linesInRange(value, expandToLines(value, selection))
+      .map((line) => trimRange(value, {
+        start: Math.max(line.start, selection.start),
+        end: Math.min(line.end, selection.end),
+      }))
+      .filter((range) => range.start !== range.end)
+  }
+
   private wrapInline(marker: string, selection: SelectionRange): void {
     const value = this.textarea.value
 
@@ -735,16 +801,14 @@ export class MarkdownEditor {
     style: InlineCommand,
     selection: SelectionRange,
   ): UnwrappableNode | null {
-    const found = this.collectInlineNode(this.getDocument(), style, selection)
-    return found
+    return this.collectInlineNodes(style).find((node) => {
+      return covers(selection, node.contentStart, node.contentEnd)
+        || (selection.start === node.sourceStart && selection.end === node.sourceEnd)
+    }) ?? null
   }
 
-  private collectInlineNode(
-    document: ParsedMessage,
-    style: InlineCommand,
-    selection: SelectionRange,
-  ): UnwrappableNode | null {
-    let found: UnwrappableNode | null = null
+  private collectInlineNodes(style: InlineCommand): UnwrappableNode[] {
+    const found: UnwrappableNode[] = []
 
     const visit = (nodes: readonly InlineNode[]): void => {
       for (const node of nodes) {
@@ -756,19 +820,14 @@ export class MarkdownEditor {
         }
 
         if (style === 'code' ? node.type === 'code' : node.type === style) {
-          if (
-            intersects(selection, node.contentStart, node.contentEnd)
-            || (selection.start === node.sourceStart && selection.end === node.sourceEnd)
-          ) {
-            found = node
-          }
+          found.push(node)
         }
 
         if (node.type !== 'code') visit(node.children)
       }
     }
 
-    for (const block of document.blocks) {
+    for (const block of this.getDocument().blocks) {
       if (block.type === 'pre') continue
       for (const line of block.lines) visit(line.nodes)
     }
@@ -863,22 +922,22 @@ export class MarkdownEditor {
   }
 }
 
+function contains(selection: SelectionRange, start: number, end: number): boolean {
+  return selection.start <= start && selection.end >= end
+}
+
+function overlaps(selection: SelectionRange, start: number, end: number): boolean {
+  if (selection.start === selection.end) {
+    return selection.start >= start && selection.start <= end
+  }
+  return selection.start < end && selection.end > start
+}
+
 function covers(selection: SelectionRange, start: number, end: number): boolean {
   if (selection.start === selection.end) {
     return selection.start >= start && selection.start <= end
   }
   return selection.start >= start && selection.end <= end
-}
-
-function intersects(
-  selection: SelectionRange,
-  start: number,
-  end: number,
-): boolean {
-  if (selection.start === selection.end) {
-    return selection.start >= start && selection.start <= end
-  }
-  return selection.start <= end && selection.end >= start
 }
 
 function visitActiveNodes(

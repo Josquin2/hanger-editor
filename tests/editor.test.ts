@@ -108,6 +108,29 @@ describe('MarkdownEditor', () => {
     expect(editor.getActiveStyles().bold).toBe(false)
   })
 
+  it('wraps a selection that spans an existing style', () => {
+    const { textarea, editor } = setup('hello **bold** world')
+    select(textarea, 0, textarea.value.length)
+    editor.toggleBold()
+    expect(textarea.value).toBe('**hello bold world**')
+    expect(editor.getDocument().entities.filter((entity) => entity.type === 'bold'))
+      .toHaveLength(1)
+  })
+
+  it('replaces existing styles line by line in a multi-line selection', () => {
+    const { textarea, editor } = setup('one **bold** two\nthree')
+    select(textarea, 0, textarea.value.length)
+    editor.toggleBold()
+    expect(textarea.value).toBe('**one bold two**\n**three**')
+  })
+
+  it('leaves a selection that cuts through an existing style alone', () => {
+    const { textarea, editor } = setup('hello **bold** world')
+    select(textarea, 8, 20)
+    editor.toggleBold()
+    expect(textarea.value).toBe('hello **bold** world')
+  })
+
   it('unwraps a style when the caret is inside it', () => {
     const { textarea, editor } = setup('**bold**')
     select(textarea, 3)
