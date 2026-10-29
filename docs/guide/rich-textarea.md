@@ -8,9 +8,19 @@ It is two aligned layers: the textarea receives input and draws the caret; an
 `aria-hidden` layer renders the same source with typographic classes. The layers
 share font, padding, line height, wrapping, and scroll position.
 
+```sh
+pnpm add hanger-editor-rich
+```
+
+The Vue wrapper lives in `hanger-editor-vue`:
+
+```sh
+pnpm add hanger-editor-vue
+```
+
 ```ts
-import { createRichTextarea } from 'hanger-editor/rich'
-import 'hanger-editor/rich-textarea.css'
+import { createRichTextarea } from 'hanger-editor-rich'
+import 'hanger-editor-rich/rich-textarea.css'
 ```
 
 ## Usage
@@ -18,8 +28,8 @@ import 'hanger-editor/rich-textarea.css'
 ::: code-group
 
 ```ts [Vanilla]
-import { createRichTextarea } from 'hanger-editor/rich'
-import 'hanger-editor/rich-textarea.css'
+import { createRichTextarea } from 'hanger-editor-rich'
+import 'hanger-editor-rich/rich-textarea.css'
 
 const host = document.querySelector<HTMLElement>('#composer')!
 const rich = createRichTextarea(host, {
@@ -41,8 +51,8 @@ rich.focus()
 ```vue [Vue / Nuxt]
 <script setup lang="ts">
 import { ref } from 'vue'
-import { RichTextarea, type RichTextareaExpose } from 'hanger-editor/vue'
-import 'hanger-editor/rich-textarea.css'
+import { RichTextarea, type RichTextareaExpose } from 'hanger-editor-vue'
+import 'hanger-editor-vue/rich-textarea.css'
 
 const message = ref('')
 const composer = ref<RichTextareaExpose | null>(null)
@@ -68,8 +78,8 @@ function send() {
 
 ```tsx [React]
 import { useEffect, useRef } from 'react'
-import { createRichTextarea, type RichTextareaController } from 'hanger-editor/rich'
-import 'hanger-editor/rich-textarea.css'
+import { createRichTextarea, type RichTextareaController } from 'hanger-editor-rich'
+import 'hanger-editor-rich/rich-textarea.css'
 
 export function Composer() {
   const host = useRef<HTMLDivElement>(null)

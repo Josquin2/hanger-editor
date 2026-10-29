@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Telegram-style markdown editor, rich textarea, parser and safe HTML renderer for Hanger chat",
   "license": "MIT",
+  "author": "Josquin <Josquinwork@mail.ru>",
   "keywords": [
     "telegram",
     "discord",
@@ -24,7 +25,9 @@
     "url": "https://github.com/Josquin2/hanger-editor/issues"
   },
   "type": "module",
-  "sideEffects": false,
+  "sideEffects": [
+    "**/*.css"
+  ],
   "files": [
     "dist",
     "README.md",
@@ -69,7 +72,18 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "check": "pnpm lint && pnpm typecheck && pnpm typecheck:docs && pnpm test && pnpm build && pnpm docs:build",
+    "release": "node scripts/release.mjs",
+    "release:help": "node scripts/release.mjs --help",
+    "release:core": "node scripts/release.mjs core",
+    "release:vue": "node scripts/release.mjs vue",
+    "release:react": "node scripts/release.mjs react",
+    "release:rich": "node scripts/release.mjs rich",
+    "release:all": "node scripts/release.mjs all",
+    "release:adapters": "node scripts/release.mjs adapters",
+    "release:pack": "node scripts/release.mjs all --pack-only",
+    "release:dry": "node scripts/release.mjs all --dry-run",
+    "test:release": "node --test scripts/release/release.test.mjs",
+    "check": "pnpm lint && pnpm typecheck && pnpm typecheck:docs && pnpm test && pnpm test:release && pnpm build && pnpm docs:build",
     "prepublishOnly": "pnpm check",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",

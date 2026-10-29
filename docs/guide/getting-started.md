@@ -3,11 +3,15 @@
 ## Install
 
 ```sh
-pnpm add hanger-editor
+pnpm add hanger-editor          # core + vanilla editor
+pnpm add hanger-editor-vue      # Vue 3 / Nuxt
+pnpm add hanger-editor-react    # React
+pnpm add hanger-editor-rich     # rich textarea (framework-agnostic)
 ```
 
-Vue and React are optional peers. Install the one you use if you want the
-matching adapter.
+The framework packages install the core package and declare only their own
+framework as a peer. The examples use those package names; the equivalent
+`hanger-editor/vue`, `/react` and `/rich` subpaths remain supported.
 
 ## Mount the editor
 
@@ -33,7 +37,7 @@ const editor = createMarkdownEditor(textarea, {
 
 ```vue [Vue / Nuxt]
 <script setup lang="ts">
-import { useMarkdownEditor } from 'hanger-editor/vue'
+import { useMarkdownEditor } from 'hanger-editor-vue'
 
 const emit = defineEmits<{ submit: [raw: string] }>()
 const message = defineModel<string>({ default: '' })
@@ -69,7 +73,7 @@ const { canSubmit, activeStyles, toggleBold, submit } = useMarkdownEditor(
 
 ```tsx [React]
 import { useState } from 'react'
-import { useMarkdownEditor } from 'hanger-editor/react'
+import { useMarkdownEditor } from 'hanger-editor-react'
 
 export function Composer() {
   const [message, setMessage] = useState('')

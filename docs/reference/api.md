@@ -7,8 +7,9 @@
 | `hanger-editor` | Parser, validator, renderer, URL policy, core types |
 | `hanger-editor/vanilla` | `MarkdownEditor`, `createMarkdownEditor` |
 | `hanger-editor/rich` | `RichTextareaController`, `createRichTextarea`, `renderRichSource` |
-| `hanger-editor/vue` | `useMarkdownEditor`, `RichTextarea` |
-| `hanger-editor/react` | `useMarkdownEditor` |
+| `hanger-editor-vue` | `useMarkdownEditor`, `RichTextarea` |
+| `hanger-editor-react` | `useMarkdownEditor` |
+| `hanger-editor-rich` | `RichTextareaController`, `createRichTextarea`, CSS |
 | `hanger-editor/rich-textarea.css` | Styles for the rich textarea |
 
 ## Parsing
@@ -210,7 +211,7 @@ controller uses it internally.
 ### Vue component
 
 ```ts
-import { RichTextarea } from 'hanger-editor/vue'
+import { RichTextarea } from 'hanger-editor-vue'
 
 interface RichTextareaExpose {
   controller: RichTextareaController | null

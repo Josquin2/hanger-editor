@@ -15,6 +15,18 @@ are optional.
 pnpm add hanger-editor
 ```
 
+Framework bindings live in separate packages with a single peer dependency:
+
+```sh
+pnpm add hanger-editor-vue     # Vue 3 / Nuxt
+pnpm add hanger-editor-react   # React
+pnpm add hanger-editor-rich    # framework-agnostic rich textarea
+```
+
+The `hanger-editor/vue`, `/react` and `/rich` subpaths remain available for
+compatibility. The dedicated packages install the core package and are the
+recommended choice.
+
 ## At a glance
 
 ```ts
@@ -45,8 +57,9 @@ change how markdown delimiters are displayed.
 | `hanger-editor` | Parser, validator, HTML renderer, URL policy |
 | `hanger-editor/vanilla` | `MarkdownEditor`, `createMarkdownEditor` |
 | `hanger-editor/rich` | `RichTextareaController`, `createRichTextarea` |
-| `hanger-editor/vue` | `useMarkdownEditor`, `RichTextarea` |
-| `hanger-editor/react` | `useMarkdownEditor` |
+| `hanger-editor-vue` | `useMarkdownEditor`, `RichTextarea` |
+| `hanger-editor-react` | `useMarkdownEditor` |
+| `hanger-editor-rich` | Rich textarea and CSS |
 
 ## Quick start
 
@@ -67,7 +80,7 @@ editor.on('change', ({ canSubmit }) => {
 
 ```vue [Vue / Nuxt]
 <script setup lang="ts">
-import { useMarkdownEditor } from 'hanger-editor/vue'
+import { useMarkdownEditor } from 'hanger-editor-vue'
 
 const message = ref('')
 const textarea = ref<HTMLTextAreaElement | null>(null)
@@ -86,7 +99,7 @@ const { canSubmit, submit } = useMarkdownEditor(textarea, message, {
 
 ```tsx [React]
 import { useState } from 'react'
-import { useMarkdownEditor } from 'hanger-editor/react'
+import { useMarkdownEditor } from 'hanger-editor-react'
 
 export function Composer() {
   const [message, setMessage] = useState('')

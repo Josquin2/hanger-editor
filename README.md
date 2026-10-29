@@ -13,8 +13,9 @@ keep working), stores plain markdown, and gives you:
   Telegram-compatible entities;
 - a **sanitised HTML renderer** for displaying messages.
 
-The core has no runtime dependencies. Vue and React bindings are optional peers.
-The parser, validator and renderer are safe to use during SSR.
+The core has no runtime dependencies. Framework adapters declare their
+framework as a peer and depend on the core package. The parser, validator and
+renderer are safe to use during SSR.
 
 ```ts
 import { parseMessage, renderHtml, validateMessage } from 'hanger-editor'
@@ -31,15 +32,29 @@ const { valid, errors } = validateMessage('   ')
 pnpm add hanger-editor
 ```
 
-Install the framework you use only if you want the matching adapter:
+Framework bindings are published as separate packages with a single, honest
+peer dependency:
+
+| Package | Contents |
+| --- | --- |
+| `hanger-editor` | Core parser, renderer, vanilla editor and rich overlay |
+| `hanger-editor-vue` | `useMarkdownEditor` and `RichTextarea` for Vue 3/Nuxt |
+| `hanger-editor-react` | `useMarkdownEditor` for React |
+| `hanger-editor-rich` | Framework-agnostic rich textarea and CSS |
 
 ```sh
-pnpm add vue     # hanger-editor/vue
-pnpm add react   # hanger-editor/react
+pnpm add hanger-editor-vue
+pnpm add hanger-editor-react
+pnpm add hanger-editor-rich
 ```
 
-`hanger-editor` is ESM + CJS, ships its own types, and targets modern browsers
-and Node 18+ (for SSR).
+The adapter packages re-export the matching core subpath, so
+`hanger-editor/vue`, `hanger-editor/react` and `hanger-editor/rich` keep
+working. The separate packages are recommended: each installs the core package
+and declares only the framework it actually needs.
+
+All packages are ESM + CJS, ship their own types, and target modern browsers and
+Node 18+ (for SSR).
 
 ## Docs and playground
 
@@ -102,8 +117,8 @@ Use this when you want formatted text in place instead of only raw markdown.
 The textarea stays native and keeps the markdown value.
 
 ```ts
-import { createRichTextarea } from 'hanger-editor/rich'
-import 'hanger-editor/rich-textarea.css'
+import { createRichTextarea } from 'hanger-editor-rich'
+import 'hanger-editor-rich/rich-textarea.css'
 
 const rich = createRichTextarea(document.querySelector('#composer')!, {
   markers: 'hidden', // 'dim' | 'visible'
@@ -119,8 +134,8 @@ In Vue:
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { RichTextarea, type RichTextareaExpose } from 'hanger-editor/vue'
-import 'hanger-editor/rich-textarea.css'
+import { RichTextarea, type RichTextareaExpose } from 'hanger-editor-vue'
+import 'hanger-editor-vue/rich-textarea.css'
 
 const message = ref('')
 const composer = ref<RichTextareaExpose | null>(null)
@@ -143,7 +158,7 @@ for the alignment rules, marker modes, and the controller API.
 
 ```vue
 <script setup lang="ts">
-import { useMarkdownEditor } from 'hanger-editor/vue'
+import { useMarkdownEditor } from 'hanger-editor-vue'
 
 const emit = defineEmits<{ submit: [raw: string] }>()
 const model = defineModel<string>({ default: '' })
@@ -224,7 +239,7 @@ function send() {
 
 ```tsx
 import { useState } from 'react'
-import { useMarkdownEditor } from 'hanger-editor/react'
+import { useMarkdownEditor } from 'hanger-editor-react'
 
 export function Composer() {
   const [message, setMessage] = useState('')
@@ -574,11 +589,28 @@ pnpm install
 pnpm lint
 pnpm typecheck
 pnpm test
+pnpm test:release  # release tooling tests
 pnpm build
 pnpm check       # lint, typecheck, tests, library and docs builds
 pnpm docs:dev    # live docs and playground at http://localhost:5173
 pnpm docs:build  # static docs in docs/.vitepress/dist
 ```
+
+Publishing is separate for each package. The release script stages a folder per
+package, checks the tarball, and publishes only what you select:
+
+```sh
+pnpm release:core -- --dry-run
+pnpm release:vue
+pnpm release:react
+pnpm release:rich
+pnpm release:adapters
+pnpm release:all
+pnpm release:pack                # tarballs in .release/artifacts
+```
+
+See [scripts/release/README.md](https://github.com/Josquin2/hanger-editor/blob/main/scripts/release/README.md)
+for order, version rules and the full flag list.
 
 The test suite covers the parser, entity offsets, HTML escaping, URL policy,
 validation, every editor command, keyboard shortcuts, the rich overlay, Vue and
